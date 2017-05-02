@@ -112,8 +112,7 @@ class BoostConan(NxConanFile):
         retrieve("0445c22a5ef3bd69f5dfb48354978421a85ab395254a26b1ffb0aa1bfd63a108",
                 [
                     "vendor://boost.org/boost/boost_{v_}.tar.gz".format(v_=self.version.replace('.', '_')),
-                    "https://dl.bintray.com/boostorg/release/{v}/source/:boost_{v_}.tar.gz".format(
-                        v=self.version, v_=self.version.replace('.', '_'))
+                    "https://github.com/boostorg/boost/archive/boost-{v}.tar.gz".format(v=self.version)
                 ],
                 "boost-{v}.tar.gz".format(v=self.version))
         if self.options.libressl_patch:
