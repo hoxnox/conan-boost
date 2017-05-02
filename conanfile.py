@@ -113,16 +113,14 @@ class BoostConan(NxConanFile):
                 [
                     "vendor://boost.org/boost/boost_{v_}.tar.gz".format(v_=self.version.replace('.', '_')),
                     "https://github.com/boostorg/boost/archive/boost-{v}.tar.gz".format(v=self.version)
-                ],
-                "boost-{v}.tar.gz".format(v=self.version))
+                ], self.staging_dir)
         if self.options.libressl_patch:
             retrieve("8b32511ffd97c1752a4886e2af3683ad1b91c9e457d5720c0508afa230bd78af",
                     [
                         "vendor://boost.org/boost/boost-{v}.libressl_patch.tar.gz".format(v=self.version),
                         "https://github.com/hoxnox/hoxnox.github.io/releases/download/0.0.0/boost-{v}.libressl_patch.tar.gz".format(
                             v=self.version)
-                    ],
-                    "boost-{v}.libressl_patch.tar.gz".format(v=self.version))
+                    ], self.staging_dir)
 
 
     def do_build(self):
@@ -132,7 +130,8 @@ class BoostConan(NxConanFile):
         command = "bootstrap" if self.settings.os == "Windows" else "./bootstrap.sh"
         if self.settings.os == "Windows" and self.settings.compiler == "gcc":
             command += " mingw"
-        self.run("cd boost_{v_} && {bootstrap}".format(v_=self.version.replace('.', '_'), bootstrap=command))
+        self.run("cd {staging_dir}/boost_{v_} && {bootstrap}".format(
+            v_=self.version.replace('.', '_'), bootstrap=command, staging_dir=self.staging_dir))
 
         flags = []
         if self.settings.compiler == "Visual Studio":
@@ -146,7 +145,7 @@ class BoostConan(NxConanFile):
         flags.append("variant=%s" % str(self.settings.build_type).lower())
         flags.append("address-model=%s" % ("32" if self.settings.arch == "x86" else "64"))
         flags.append("threading=multi")
-        flags.append("--prefix=../{staging_dir}".format(staging_dir=self.staging_dir))
+        flags.append("--prefix={staging_dir}".format(staging_dir=self.staging_dir))
         flags.append("--layout=system")
         flags.append("--ignore-site-config")
 
@@ -212,7 +211,8 @@ class BoostConan(NxConanFile):
         cxx_flags = 'cxxflags="%s"' % " ".join(cxx_flags) if cxx_flags else ""
         flags.append(cxx_flags)
 
-        full_command = "cd boost_{v_} && {b2} {b2_flags} -j{cpu_cnt} install".format(
+        full_command = "cd {staging_dir}/boost_{v_} && {b2} {b2_flags} -j{cpu_cnt} install".format(
+            staging_dir = self.staging_dir,
             v_ = self.version.replace('.', '_'),
             b2 = "b2" if self.settings.os == "Windows" else "./b2",
             b2_flags = " ".join(flags),
