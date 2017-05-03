@@ -1,7 +1,7 @@
 from conans import ConanFile
 from conans import tools
 import platform, os, sys
-from nxtools import NxConanFile, retrieve
+from nxtools import NxConanFile
 
 
 class BoostConan(NxConanFile):
@@ -9,9 +9,10 @@ class BoostConan(NxConanFile):
     description = "Boost libraries."
     version = "1.64.0"
     settings = "os", "arch", "compiler", "build_type"
-    url="https://github.com/hoxnox/conan-boost"
-    license="Boost Software License - Version 1.0. http://www.boost.org/LICENSE_1_0.txt"
+    url = "https://github.com/hoxnox/conan-boost"
+    license = "Boost Software License - Version 1.0. http://www.boost.org/LICENSE_1_0.txt"
     # The current python option requires the package to be built locally, to find default Python implementation
+    exports = "boost-1.64.0.libressl_patch.tar.gz", "nxtools/__init__.py", "nxtools/nx_conan_file.py"
     options = {
         "shared": [True, False],
         "header_only": [True, False],
@@ -47,7 +48,6 @@ class BoostConan(NxConanFile):
         "without_type_erasure": [True, False],
         "without_wave": [True, False]
     }
-
     default_options = "shared=False", \
         "header_only=False", \
         "fPIC=False", \
@@ -99,38 +99,33 @@ class BoostConan(NxConanFile):
             self.options.shared = False
 
         if not self.options.without_iostreams:
-            if self.settings.os == "Linux" or self.settings.os == "Macos":
-                self.requires("bzip2/1.0.6@lasote/stable")
-                if not self.options.header_only:
-                    self.options["bzip2/1.0.6"].shared = self.options.shared
-            self.requires("zlib/1.2.11@lasote/stable")
+            self.requires("zlib/1.2.11@hoxnox/testing")
             if not self.options.header_only:
                 self.options["zlib"].shared = self.options.shared
 
 
     def do_source(self):
-        retrieve("0445c22a5ef3bd69f5dfb48354978421a85ab395254a26b1ffb0aa1bfd63a108",
+        self.retrieve("0445c22a5ef3bd69f5dfb48354978421a85ab395254a26b1ffb0aa1bfd63a108",
                 [
                     "vendor://boost.org/boost/boost_{v_}.tar.gz".format(v_=self.version.replace('.', '_')),
                     "https://github.com/boostorg/boost/archive/boost-{v}.tar.gz".format(v=self.version)
-                ], self.staging_dir)
-        if self.options.libressl_patch:
-            retrieve("8b32511ffd97c1752a4886e2af3683ad1b91c9e457d5720c0508afa230bd78af",
-                    [
-                        "vendor://boost.org/boost/boost-{v}.libressl_patch.tar.gz".format(v=self.version),
-                        "https://github.com/hoxnox/hoxnox.github.io/releases/download/0.0.0/boost-{v}.libressl_patch.tar.gz".format(
-                            v=self.version)
-                    ], self.staging_dir)
+                ], "boost-{v}.tar.gz".format(v=self.version))
 
 
     def do_build(self):
         if self.options.header_only:
             self.output.warn("Header only package, skipping build")
             return
+
+        build_dir = "{staging_dir}/src".format(staging_dir=self.staging_dir)
+        tools.untargz("boost-{v}.tar.gz".format(v=self.version), build_dir)
+        if self.options.libressl_patch:
+            tools.untargz("boost-{v}.libressl_patch.tar.gz".format(v=self.version), build_dir)
+
         command = "bootstrap" if self.settings.os == "Windows" else "./bootstrap.sh"
         if self.settings.os == "Windows" and self.settings.compiler == "gcc":
             command += " mingw"
-        self.run("cd {staging_dir}/boost_{v_} && {bootstrap}".format(
+        self.run("cd {staging_dir}/src/boost_{v_} && {bootstrap}".format(
             v_=self.version.replace('.', '_'), bootstrap=command, staging_dir=self.staging_dir))
 
         flags = []
@@ -211,7 +206,7 @@ class BoostConan(NxConanFile):
         cxx_flags = 'cxxflags="%s"' % " ".join(cxx_flags) if cxx_flags else ""
         flags.append(cxx_flags)
 
-        full_command = "cd {staging_dir}/boost_{v_} && {b2} {b2_flags} -j{cpu_cnt} install".format(
+        full_command = "cd {staging_dir}/src/boost_{v_} && {b2} {b2_flags} -j{cpu_cnt} install".format(
             staging_dir = self.staging_dir,
             v_ = self.version.replace('.', '_'),
             b2 = "b2" if self.settings.os == "Windows" else "./b2",
@@ -238,6 +233,6 @@ class BoostConan(NxConanFile):
                 "signals coroutine context timer thread chrono date_time atomic filesystem system").split()
 
         if not self.options.without_python and not self.options.shared:
-                self.cpp_info.defines.append("BOOST_PYTHON_STATIC_LIB")
+            self.cpp_info.defines.append("BOOST_PYTHON_STATIC_LIB")
 
         self.cpp_info.libs.extend(["boost_%s" % lib for lib in libs])
