@@ -1,7 +1,7 @@
-from conans import ConanFile
 from conans import tools
-import platform, os, sys
+import os
 from nxtools import NxConanFile
+from conans.paths import RUN_LOG_NAME
 
 
 class BoostConan(NxConanFile):
@@ -52,7 +52,7 @@ class BoostConan(NxConanFile):
         "header_only=False", \
         "fPIC=False", \
         "libressl_patch=True", \
-        "without_python=False", \
+        "without_python=True", \
         "without_atomic=False", \
         "without_chrono=False", \
         "without_container=False", \
@@ -130,7 +130,11 @@ class BoostConan(NxConanFile):
 
         flags = []
         if self.settings.compiler == "Visual Studio":
-            flags.append("toolset=msvc-%s.0" % self.settings.compiler.version)
+            if self.settings.compiler.version=="15":
+                # toolset=msvc-15.0 doesn't work in 1.64
+                flags.append("toolset=msvc-14.1")
+            else:
+                flags.append("toolset=msvc-%s.0" % self.settings.compiler.version)
         elif str(self.settings.compiler) in ["clang", "gcc"]:
             flags.append("toolset=%s"% self.settings.compiler)
 
@@ -175,7 +179,7 @@ class BoostConan(NxConanFile):
             "--without-wave": self.options.without_wave
         }
 
-        for option_name, activated in option_names.iteritems():
+        for option_name, activated in option_names.items():
             if activated:
                 flags.append(option_name)
 
@@ -213,7 +217,7 @@ class BoostConan(NxConanFile):
             b2_flags = " ".join(flags),
             cpu_cnt = tools.cpu_count())
         self.output.warn(full_command)
-        self.run(full_command)#, output=False)
+        self._runner(full_command, self.output, os.path.abspath(RUN_LOG_NAME),  None)
 
 
     def do_package_info(self):
@@ -235,4 +239,12 @@ class BoostConan(NxConanFile):
         if not self.options.without_python and not self.options.shared:
             self.cpp_info.defines.append("BOOST_PYTHON_STATIC_LIB")
 
-        self.cpp_info.libs.extend(["boost_%s" % lib for lib in libs])
+        for option in self.options.fields:
+            if option.startswith('without_') and getattr(self.options, option):
+                lib_name = option[8:]
+                libs = [l for l in libs if not lib_name in l]
+
+        if self.settings.compiler != "Visual Studio":
+            self.cpp_info.libs.extend(["boost_%s" % lib for lib in libs])
+        else:
+            self.cpp_info.libs.extend(["libboost_%s.lib" % lib for lib in libs])
