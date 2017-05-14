@@ -108,7 +108,8 @@ class BoostConan(NxConanFile):
         self.retrieve("0445c22a5ef3bd69f5dfb48354978421a85ab395254a26b1ffb0aa1bfd63a108",
                 [
                     "vendor://boost.org/boost/boost_{v_}.tar.gz".format(v_=self.version.replace('.', '_')),
-                    "https://github.com/boostorg/boost/archive/boost-{v}.tar.gz".format(v=self.version)
+                    "https://sourceforge.net/projects/boost/files/boost/{v}/boost_{v_}.tar.gz/download".format(
+                        v=self.version, v_=self.version.replace('.','_'))
                 ], "boost-{v}.tar.gz".format(v=self.version))
 
 
