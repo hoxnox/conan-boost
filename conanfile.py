@@ -236,9 +236,9 @@ class BoostConan(NxConanFile):
         if self.options.header_only:
             return
 
-        libs = ("python wave unit_test_framework prg_exec_monitor test_exec_monitor container exception "
-                "graph iostreams locale log log_setup math_c99 math_c99f math_c99l math_tr1 "
-                "math_tr1f math_tr1l program_options random regex wserialization serialization "
+        libs = ("python wave unit_test_framework test_exec_monitor container exception "
+                "graph iostreams locale log log_setup math_c99 math_c99f math_c99l"
+                "program_options random regex wserialization serialization "
                 "signals coroutine context timer thread chrono date_time atomic filesystem system").split()
 
         if not self.options.without_python and not self.options.shared:
