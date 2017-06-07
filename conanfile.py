@@ -27,6 +27,7 @@ class BoostConan(NxConanFile):
         "without_coroutine2": [True, False],
         "without_date_time": [True, False],
         "without_exception": [True, False],
+        "without_fiber": [True, False],
         "without_filesystem": [True, False],
         "without_graph": [True, False],
         "without_graph_parallel": [True, False],
@@ -34,8 +35,8 @@ class BoostConan(NxConanFile):
         "without_locale": [True, False],
         "without_log": [True, False],
         "without_math": [True, False],
+        "without_metaparse": [True, False],
         "without_mpi": [True, False],
-        "without_process": [True, False],
         "without_program_options": [True, False],
         "without_random": [True, False],
         "without_regex": [True, False],
@@ -48,6 +49,7 @@ class BoostConan(NxConanFile):
         "without_type_erasure": [True, False],
         "without_wave": [True, False]
     }
+
     default_options = "shared=False", \
         "header_only=False", \
         "fPIC=False", \
@@ -62,14 +64,15 @@ class BoostConan(NxConanFile):
         "without_date_time=False", \
         "without_exception=False", \
         "without_filesystem=False", \
+        "without_fiber=False", \
         "without_graph=False", \
         "without_graph_parallel=False", \
         "without_iostreams=False", \
         "without_locale=False", \
         "without_log=False", \
         "without_math=False", \
+        "without_metaparse=False", \
         "without_mpi=False", \
-        "without_process=False", \
         "without_program_options=False", \
         "without_random=False", \
         "without_regex=False", \
@@ -159,14 +162,15 @@ class BoostConan(NxConanFile):
             "--without-date_time": self.options.without_date_time,
             "--without-exception": self.options.without_exception,
             "--without-filesystem": self.options.without_filesystem,
+            "--without-fiber": self.options.without_fiber,
             "--without-graph": self.options.without_graph,
             "--without-graph_parallel": self.options.without_graph_parallel,
             "--without-iostreams": self.options.without_iostreams,
             "--without-locale": self.options.without_locale,
             "--without-log": self.options.without_log,
             "--without-math": self.options.without_math,
+            "--without-metaparse": self.options.without_metaparse,
             "--without-mpi": self.options.without_mpi,
-            "--without-process": self.options.without_process,
             "--without-program_options": self.options.without_program_options,
             "--without-random": self.options.without_random,
             "--without-regex": self.options.without_regex,
