@@ -2,6 +2,7 @@ from conans import tools
 import os
 from nxtools import NxConanFile
 from conans.paths import RUN_LOG_NAME
+from tempfile import mkdtemp
 
 
 class BoostConan(NxConanFile):
@@ -121,6 +122,7 @@ class BoostConan(NxConanFile):
             self.output.warn("Header only package, skipping build")
             return
 
+        self.staging_dir = mkdtemp() # the path is shorter for windows builds
         build_dir = "{staging_dir}/src".format(staging_dir=self.staging_dir)
         tools.untargz("boost-{v}.tar.gz".format(v=self.version), build_dir)
         if self.options.libressl_patch:
@@ -237,7 +239,7 @@ class BoostConan(NxConanFile):
             return
 
         libs = ("python wave unit_test_framework test_exec_monitor container exception "
-                "graph iostreams locale log log_setup math_c99 math_c99f math_c99l"
+                "graph iostreams locale log log_setup math_c99 math_c99f math_c99l "
                 "program_options random regex wserialization serialization "
                 "signals coroutine context timer thread chrono date_time atomic filesystem system").split()
 
