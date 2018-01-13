@@ -6,7 +6,7 @@ username = os.getenv("CONAN_USERNAME", "hoxnox")
 
 class SnappyTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    requires = "boost/1.64.0@%s/%s" % (username, channel)
+    requires = "boost/1.66.0@%s/%s" % (username, channel)
     # default_options = "snappy:system=True", "snappy:root=/tmp/sss"
     # default_options = "boost:with_filesystem=True"
     generators = "cmake"

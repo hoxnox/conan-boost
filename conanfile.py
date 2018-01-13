@@ -7,12 +7,12 @@ from conans.paths import RUN_LOG_NAME
 class BoostConan(NxConanFile):
     name = "boost"
     description = "Boost libraries."
-    version = "1.64.0"
+    version = "1.66.0"
     settings = "os", "arch", "compiler", "build_type"
     url = "https://github.com/hoxnox/conan-boost"
     license = "Boost Software License - Version 1.0. http://www.boost.org/LICENSE_1_0.txt"
     # The current python option requires the package to be built locally, to find default Python implementation
-    exports = "boost-1.64.0.libressl_patch.tar.gz", "nxtools/__init__.py", "nxtools/nx_conan_file.py"
+    exports = "boost-1.66.0.libressl_patch.tar.gz", "nxtools/__init__.py", "nxtools/nx_conan_file.py"
     options = {
         "shared": [True, False],
         "header_only": [True, False],
@@ -105,10 +105,10 @@ class BoostConan(NxConanFile):
 
 
     def do_source(self):
-        self.retrieve("0445c22a5ef3bd69f5dfb48354978421a85ab395254a26b1ffb0aa1bfd63a108",
+        self.retrieve("bd0df411efd9a585e5a2212275f8762079fed8842264954675a4fddc46cfcf60",
                 [
-                    "vendor://boost.org/boost/boost_{v_}.tar.gz".format(v_=self.version.replace('.', '_')),
-                    "https://sourceforge.net/projects/boost/files/boost/{v}/boost_{v_}.tar.gz/download".format(
+                    "vendor://boost.org/boost/boost_{v_}_rc2.tar.gz".format(v_=self.version.replace('.', '_')),
+                    "https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0_rc2.tar.gz".format(
                         v=self.version, v_=self.version.replace('.','_'))
                 ], "boost-{v}.tar.gz".format(v=self.version))
 
@@ -120,8 +120,6 @@ class BoostConan(NxConanFile):
 
         build_dir = "{staging_dir}/src".format(staging_dir=self.staging_dir)
         tools.untargz("boost-{v}.tar.gz".format(v=self.version), build_dir)
-        if self.options.libressl_patch:
-            tools.untargz("boost-{v}.libressl_patch.tar.gz".format(v=self.version), build_dir)
 
         command = "bootstrap" if self.settings.os == "Windows" else "./bootstrap.sh"
         if self.settings.os == "Windows" and self.settings.compiler == "gcc":
