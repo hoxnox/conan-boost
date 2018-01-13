@@ -99,7 +99,7 @@ class BoostConan(NxConanFile):
             self.options.shared = False
 
         if not self.options.without_iostreams:
-            self.requires("zlib/1.2.11@hoxnox/testing")
+            self.requires("zlib/1.2.11@hoxnox/stable")
             if not self.options.header_only:
                 self.options["zlib"].shared = self.options.shared
 
