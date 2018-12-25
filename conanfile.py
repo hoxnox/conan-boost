@@ -222,7 +222,7 @@ class BoostConan(NxConanFile):
             b2_flags = " ".join(flags),
             cpu_cnt = tools.cpu_count())
         self.output.warn(full_command)
-        self._runner(full_command, self.output, os.path.abspath(RUN_LOG_NAME),  None)
+        self._conan_runner(full_command, self.output, os.path.abspath(RUN_LOG_NAME),  None)
 
 
     def do_package_info(self):
