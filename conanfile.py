@@ -18,6 +18,7 @@ class BoostConan(NxConanFile):
         "shared": [True, False],
         "header_only": [True, False],
         "fPIC": [True, False],
+        "icu": [True, False],
         "libressl_patch":[True, False],
         "without_python": [True, False],
         "without_atomic": [True, False],
@@ -54,6 +55,7 @@ class BoostConan(NxConanFile):
     default_options = "shared=False", \
         "header_only=False", \
         "fPIC=False", \
+        "icu=False", \
         "libressl_patch=True", \
         "without_python=True", \
         "without_atomic=False", \
@@ -102,6 +104,9 @@ class BoostConan(NxConanFile):
            self.options.shared and "MT" in str(self.settings.compiler.runtime):
             self.options.shared = False
 
+        if self.options.icu:
+            self.requires("icu/64.2@hoxnox/stable")
+
         if not self.options.without_iostreams:
             self.requires("zlib/1.2.11@hoxnox/stable")
             if not self.options.header_only:
@@ -129,7 +134,8 @@ class BoostConan(NxConanFile):
         command = "bootstrap" if self.settings.os == "Windows" else "./bootstrap.sh"
         if self.settings.os == "Windows" and self.settings.compiler == "gcc":
             command += " mingw"
-        self.run("cd {staging_dir}/src/boost_{v_} && {bootstrap}".format(
+        self.run("cd {staging_dir}/src/boost_{v_} && {bootstrap} {icu}".format(
+            icu = "--with-icu=\"%s\"" % self.deps_cpp_info["icu"].rootpath if self.options.icu else "",
             v_=self.version.replace('.', '_'), bootstrap=command, staging_dir=self.staging_dir))
 
         flags = []
