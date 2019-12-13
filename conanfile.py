@@ -8,7 +8,7 @@ from tempfile import mkdtemp
 class BoostConan(NxConanFile):
     name = "boost"
     description = "Boost libraries."
-    version = "1.66.0"
+    version = "1.72.0"
     settings = "os", "arch", "compiler", "build_type"
     url = "https://github.com/hoxnox/conan-boost"
     license = "Boost Software License - Version 1.0. http://www.boost.org/LICENSE_1_0.txt"
@@ -43,7 +43,6 @@ class BoostConan(NxConanFile):
         "without_random": [True, False],
         "without_regex": [True, False],
         "without_serialization": [True, False],
-        "without_signals": [True, False],
         "without_system": [True, False],
         "without_test": [True, False],
         "without_thread": [True, False],
@@ -80,7 +79,6 @@ class BoostConan(NxConanFile):
         "without_random=False", \
         "without_regex=False", \
         "without_serialization=False", \
-        "without_signals=False", \
         "without_system=False", \
         "without_test=False", \
         "without_thread=False", \
@@ -114,10 +112,10 @@ class BoostConan(NxConanFile):
 
 
     def do_source(self):
-        self.retrieve("bd0df411efd9a585e5a2212275f8762079fed8842264954675a4fddc46cfcf60",
+        self.retrieve("c66e88d5786f2ca4dbebb14e06b566fb642a1a6947ad8cc9091f9f445134143f",
                 [
-                    "vendor://boost.org/boost/boost_{v_}_rc2.tar.gz".format(v_=self.version.replace('.', '_')),
-                    "https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0_rc2.tar.gz".format(
+                    "vendor://boost.org/boost/boost_{v_}.tar.gz".format(v_=self.version.replace('.', '_')),
+                    "https://dl.bintray.com/boostorg/release/{v}/source/boost_{v_}.tar.gz".format(
                         v=self.version, v_=self.version.replace('.','_'))
                 ], "boost-{v}.tar.gz".format(v=self.version))
 
@@ -181,7 +179,6 @@ class BoostConan(NxConanFile):
             "--without-random": self.options.without_random,
             "--without-regex": self.options.without_regex,
             "--without-serialization": self.options.without_serialization,
-            "--without-signals": self.options.without_signals,
             "--without-system": self.options.without_system,
             "--without-test": self.options.without_test,
             "--without-thread": self.options.without_thread,
@@ -245,7 +242,7 @@ class BoostConan(NxConanFile):
         libs = ("python wave unit_test_framework test_exec_monitor container exception "
                 "graph iostreams locale log log_setup math_c99 math_c99f math_c99l "
                 "program_options random regex wserialization serialization "
-                "signals coroutine context timer thread chrono date_time atomic filesystem system").split()
+                "coroutine context timer thread chrono date_time atomic filesystem system").split()
 
         if not self.options.without_python and not self.options.shared:
             self.cpp_info.defines.append("BOOST_PYTHON_STATIC_LIB")
